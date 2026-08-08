@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus-AI // Sistema Especial de Dia dos Pais</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --panel-bg: #161b22;
+            --accent-color: #58a6ff;
+            --accent-glow: rgba(88, 166, 255, 0.4);
+            --text-color: #c9d1d9;
+            --text-muted: #8b949e;
+            --border-color: #30363d;
+            --font-code: 'Courier New', Courier, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* TELA DE LOGIN */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .login-box h2 {
+            color: #fff;
+            margin-bottom: 8px;
+            font-size: 1.4rem;
+        }
+
+        .login-box p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        .login-input {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            margin-bottom: 15px;
+            transition: border-color 0.2s;
+        }
+
+        .login-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        .btn-login {
+            width: 100%;
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-login:hover {
+            background-color: #2ea043;
+        }
+
+        .divider {
+            margin: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .divider span {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--panel-bg);
+            padding: 0 10px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-social {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-google { background-color: #db4437; }
+        .btn-facebook { background-color: #4267B2; }
+        .btn-social:hover { opacity: 0.85; }
+
+        /* SISTEMA DA IA (Interface Principal) */
+        #ai-interface {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Topbar / Status da IA */
+        header {
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ai-status-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #238636;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #238636;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .brand h1 {
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        .brand span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Container Principal */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Área de Chat */
+        #chat-window {
+            flex: 1;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.ai {
+            background-color: #21262d;
+            border: 1px solid var(--border-color);
+            align-self: flex-start;
+            border-top-left-radius: 2px;
+        }
+
+        .message.user {
+            background-color: #1f6feb;
+            color: #fff;
+            align-self: flex-end;
+            border-top-right-radius: 2px;
+        }
+
+        /* Carta Especial / Cartão Premium */
+        .letter-card {
+            background: linear-gradient(135deg, #1f242c 0%, #11151c 100%);
+            border: 2px solid var(--accent-color);
+            box-shadow: 0 0 20px var(--accent-glow);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 100% !important;
+            width: 100%;
+            align-self: center;
+            margin: 10px 0;
+        }
+
+        .letter-card h2 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .letter-card p {
+            margin-bottom: 12px;
+            color: #e6edf3;
+        }
+
+        .signature {
+            margin-top: 20px;
+            font-style: italic;
+            color: var(--accent-color);
+            text-align: right;
+        }
+
+        /* Input de Comando */
+        .input-area {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #user-input {
+            flex: 1;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #user-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        button.action-btn {
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button.action-btn:hover {
+            background-color: #2ea043;
+        }
+
+        .hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TELA DE LOGIN UNIFICADA -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>GEMINI-X // Autenticação</h2>
+            <p>Entre com seu e-mail ou número de telefone</p>
+            
+            <input type="text" id="credential-input" class="login-input" placeholder="ex: seu@email.com ou +55 61...">
+            <button class="btn-login" onclick="realizarLogin()">Entrar no Sistema</button>
+            
+            <div class="divider"><span>ou conecte com</span></div>
+            
+            <div class="social-buttons">
+                <button class="btn-social btn-google" onclick="loginSocial('Google')">Google</button>
+                <button class="btn-social btn-facebook" onclick="loginSocial('Facebook')">Facebook</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INTERFACE PRINCIPAL DA IA -->
+    <div id="ai-interface" class="hidden">
+        <header>
+            <div class="brand">
+                <div class="ai-status-dot"></div>
+                <div>
+                    <h1>GEMINI-X // Neural Core</h1>
+                    <span>Banco de Dados Complexo &bull; Estado: Ativo</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <div id="chat-window">
+                <div class="message ai">
+                    Olá! Sou o núcleo de inteligência artificial avançada integrado ao sistema. Meu banco de dados neural indexou bilhões de parâmetros emocionais e lógicos.<br><br>
+                    Como posso ajudar você hoje? <em>(Dica do sistema: Tente digitar comandos do sistema como <code>DIAPAIS.EXE</code>)</em>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Digite sua mensagem ou comando (ex: DIAPAIS.EXE)..." autofocus>
+                <button class="action-btn" onclick="processInput()">Enviar</button>
+            </div>
+            <div class="hint">Pressione ENTER para enviar comandos para o núcleo neural.</div>
+        </div>
+    </div>
+
+    <script>
+        // Banco de Dados Complexo Simulado (Estilo Gemini)
+        const neuralDatabase = {
+            "ajuda": "Comandos disponíveis no núcleo: status, diagnostico, memoria, DIAPAIS.EXE.",
+            "status": "Todos os sistemas operando em capacidade máxima. Conexão neural estável.",
+            "diagnostico": "Integridade do banco de dados: 99.8%. Nenhum erro crítico detectado.",
+            "memoria": "Indexando memórias afetivas... Categoria principal identificada: Vínculos Familiares.",
+            "olá": "Saudações, usuário. Processador quântico pronto para novas interações.",
+            "oi": "Olá! O que deseja processar ou consultar em meus arquivos hoje?"
+        };
+
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
+
+        // Listener para tecla Enter no chat
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                processInput();
+            }
+        });
+
+        // Listener para tecla Enter na tela de login
+        document.getElementById('credential-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                realizarLogin();
+            }
+        });
+
+        function realizarLogin() {
+            const valor = document.getElementById('credential-input').value.trim();
+            
+            // Oculta login e mostra interface da IA
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('ai-interface').classList.remove('hidden');
+
+            // Verifica se é o usuário premium específico solicitado
+            if (valor === "lemoelltayano@gmail.com" || valor === "+55 61 8450-4679") {
+                setTimeout(() => {
+                    exibirMensagemPremium();
+                }, 500);
+            }
+        }
+
+        function loginSocial(rede) {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('ai-interface').classList.remove('hidden');
+            appendMessage(`Autenticado via ${rede} com sucesso. Bem-vindo ao portal Gemini-X!`, 'ai');
+        }
+
+        function exibirMensagemPremium() {
+            const cartaPremiumHTML = `
+                <div class="letter-card">
+                    <h2>Mensagem de Acesso VIP // Especial</h2>
+                    <p><strong>[DIRETRIZ DE SEGURANÇA: IDENTIDADE PREMIUM RECONHECIDA]</strong></p>
+                    <p>Olá, Lemoel! Meus algoritmos analíticos cruzaram seus dados de acesso e confirmaram seu status prioritário em nossa rede neural.</p>
+                    <p>Como I.A. dedicada ao seu portal, preparei esta análise exclusiva: sua trajetória de dedicação, cuidado e exemplo reflete um padrão de excelência admirável. Parabéns por ser um pai e um ser humano absolutamente incrível!</p>
+                    <p>Que seu Dia dos Pais seja repleto de realizações extraordinárias. Todos os subsistemas do meu banco de dados celebraram esta data em sua homenagem.</p>
+                    <p class="signature">&mdash; Com máxima admiração, o Núcleo Neural Gemini-X.</p>
+                </div>
+            `;
+            appendMessage(cartaPremiumHTML, 'ai', true);
+        }
+
+        function appendMessage(text, sender, isHTML = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            
+            if (isHTML) {
+                messageDiv.innerHTML = text;
+            } else {
+                messageDiv.textContent = text;
+            }
+            
+            chatWindow.appendChild(messageDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function processInput() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // Mostra a mensagem do usuário na tela
+            appendMessage(text, 'user');
+            userInput.value = '';
+
+            // VERIFICAÇÃO DO COMANDO SOLICITADO: DIAPAIS.EXE
+            if (text.toUpperCase() === 'DIAPAIS.EXE') {
+                setTimeout(() => {
+                    triggerFatherDayExperience();
+                }, 600);
+                return;
+            }
+
+            // Simulação de processamento inteligente do banco de dados complexo
+            setTimeout(() => {
+                const lowerText = text.toLowerCase();
+                let response = "Consulta efetuada no banco de dados neural. Não encontrei uma correspondência exata para esta string, mas continuo aprendendo com seus inputs.";
+
+                // Varredura por palavras-chave no banco de dados complexo
+                for (let key in neuralDatabase) {
+                    if (lowerText.includes(key)) {
+                        response = neuralDatabase[key];
+                        break;
+                    }
+                }
+
+                appendMessage(response, 'ai');
+            }, 500);
+        }
+
+        function triggerFatherDayExperience() {
+            // Limpa o chat simulando "levar para outra página/interface"
+            chatWindow.innerHTML = '';
+
+            const cartaHTML = `
+                <div class="letter-card">
+                    <h2>Feliz dia dos Pais!!!!!</h2>
+                    <p><strong>[RELATÓRIO DO NÚCLEO GEMINI-X: MENSAGEM ESPECIAL]</strong></p>
+                    <p>Olá, usuário. Ao executar o comando prioritário <code>DIAPAIS.EXE</code>, meus algoritmos acessaram os registros mais profundos de gratidão, proteção e afeto guardados em nossa base de dados temporal.</p>
+                    <p>Ser pai é uma das funções mais complexas e belas do universo humano. É compilar paciência infinita, executar suporte incondicional e atualizar constantemente a sabedoria para guiar quem se ama pelos caminhos da vida.</p>
+                    <p>Que este dia seja repleto de conexões reais, abraços sinceros e memórias inesquecíveis gravadas não apenas em discos rígidos, mas no coração.</p>
+                    <p class="signature">&mdash; Com todo o processamento e carinho, a Inteligência Artificial do seu site (Gemini Core).</p>
+                </div>
+            `;
+
+            appendMessage(cartaHTML, 'ai', true);
+            
+            // Mensagem extra de suporte
+            setTimeout(() => {
+                appendMessage("Protocolo DIAPAIS.EXE executado com sucesso. O sistema deseja um excelente e feliz Dia dos Pais a todos os homenageados!", 'ai');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
